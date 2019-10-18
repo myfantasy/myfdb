@@ -5,7 +5,9 @@ run:
 br: build run
 
 pre_test:
-	rm -R test/
+	if [ -d "test/" ]; then \
+		rm -R test/; \
+	fi;	
 	mkdir test/
 
 t: pre_test
