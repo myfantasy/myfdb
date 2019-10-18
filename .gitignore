@@ -15,4 +15,4 @@ bin/app
 
 /data/*
 /db/*
-/tst/*
+/test/*
