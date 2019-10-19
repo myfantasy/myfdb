@@ -16,6 +16,9 @@ type DB struct {
 
 	DefaultFlushTimeout time.Duration
 
+	MasterTokens []string
+	tokenOk      map[string]bool
+
 	eo ErrorsOut
 
 	mx sync.RWMutex
@@ -103,6 +106,8 @@ func CreateDB(path string, defaultFlushTimeout time.Duration, eo ErrorsOut) (db 
 		}
 	}
 
+	db.tokenOk = make(map[string]bool)
+
 	for n, v := range db.IntTable {
 		v.BaseFolder = db.BaseStorage
 		err = v.Init(db.eo)
@@ -173,4 +178,69 @@ func (db *DB) TableStringGet(tblName string) (tbl *TableString, parErr error) {
 
 	return tbl, nil
 
+}
+
+// CheckToken check token exists
+func (db *DB) CheckToken(token string) bool {
+	ok := false
+	exit := false
+	db.mx.RLock()
+	if len(db.MasterTokens) == 0 {
+		ok = true
+	} else if token == "" {
+		exit = true
+	} else {
+		_, ok = db.tokenOk[token]
+	}
+	db.mx.RUnlock()
+
+	if ok || exit {
+		return ok
+	}
+
+	h := HashGet(token)
+	db.mx.RLock()
+	for _, v := range db.MasterTokens {
+		if v == h {
+			ok = true
+			break
+		}
+	}
+	db.mx.RUnlock()
+
+	if ok {
+		db.mx.Lock()
+		db.tokenOk[token] = true
+		db.mx.Unlock()
+	}
+
+	return ok
+}
+
+// RMToken remove exists token
+func (db *DB) RMToken(token string) {
+
+	h := HashGet(token)
+	db.mx.RLock()
+
+	db.MasterTokens = SliceRemoveString(db.MasterTokens, h)
+	db.tokenOk = make(map[string]bool)
+	db.mx.RUnlock()
+}
+
+// AddToken Add new token
+func (db *DB) AddToken(token string) {
+
+	if token == "" {
+		return
+	}
+	ok := db.CheckToken(token)
+	h := HashGet(token)
+	db.mx.RLock()
+
+	if len(db.MasterTokens) == 0 || !ok {
+		db.MasterTokens = append(db.MasterTokens, h)
+	}
+
+	db.mx.RUnlock()
 }

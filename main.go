@@ -78,33 +78,21 @@ func fastHTTPHandlerDblErrorBodyJSON(ctx *fasthttp.RequestCtx, b []byte, parErr 
 }
 
 func fastHTTPHandler(ctx *fasthttp.RequestCtx) {
+
+	token := ""
+	ctx.Request.Header.VisitAll(func(key, value []byte) {
+		if string(key) == "Token" {
+			token = string(value)
+		}
+	})
+
+	if !dataBase.CheckToken(token) {
+		fmt.Fprint(ctx, "401 Unauthorized")
+		ctx.Response.SetStatusCode(401)
+		return
+	}
+
 	url := string(ctx.URI().Path())
-
-	if url == "/i/create_table/" {
-		parErr, intErr := dataBase.CreateTableIntFromJSON(ctx.PostBody())
-		fastHTTPHandlerDblError(ctx, parErr, intErr)
-
-		return
-	}
-	if url == "/s/create_table/" {
-		parErr, intErr := dataBase.CreateTableStringFromJSON(ctx.PostBody())
-		fastHTTPHandlerDblError(ctx, parErr, intErr)
-
-		return
-	}
-
-	if url == "/i/create_index/" {
-		parErr, intErr := dataBase.CreateIndexOnTableIntFromJSON(ctx.PostBody())
-		fastHTTPHandlerDblError(ctx, parErr, intErr)
-
-		return
-	}
-	if url == "/s/create_index/" {
-		parErr, intErr := dataBase.CreateIndexOnTableStringFromJSON(ctx.PostBody())
-		fastHTTPHandlerDblError(ctx, parErr, intErr)
-
-		return
-	}
 
 	if url == "/i/set/" {
 		b, parErr, intErr := dataBase.SetItemIntoTableIntFromJSON(ctx.PostBody())
@@ -160,6 +148,45 @@ func fastHTTPHandler(ctx *fasthttp.RequestCtx) {
 	if url == "/c/struct/" {
 		b, err := dataBase.StructGet()
 		fastHTTPHandlerBodyJSON(ctx, b, err)
+
+		return
+	}
+
+	if url == "/i/create_table/" {
+		parErr, intErr := dataBase.CreateTableIntFromJSON(ctx.PostBody())
+		fastHTTPHandlerDblError(ctx, parErr, intErr)
+
+		return
+	}
+	if url == "/s/create_table/" {
+		parErr, intErr := dataBase.CreateTableStringFromJSON(ctx.PostBody())
+		fastHTTPHandlerDblError(ctx, parErr, intErr)
+
+		return
+	}
+
+	if url == "/i/create_index/" {
+		parErr, intErr := dataBase.CreateIndexOnTableIntFromJSON(ctx.PostBody())
+		fastHTTPHandlerDblError(ctx, parErr, intErr)
+
+		return
+	}
+	if url == "/s/create_index/" {
+		parErr, intErr := dataBase.CreateIndexOnTableStringFromJSON(ctx.PostBody())
+		fastHTTPHandlerDblError(ctx, parErr, intErr)
+
+		return
+	}
+
+	if url == "/sec/token_add/" {
+		parErr, intErr := dataBase.AddTokenFromJSON(ctx.PostBody())
+		fastHTTPHandlerDblError(ctx, parErr, intErr)
+
+		return
+	}
+	if url == "/sec/token_remove/" {
+		parErr, intErr := dataBase.RMTokenFromJSON(ctx.PostBody())
+		fastHTTPHandlerDblError(ctx, parErr, intErr)
 
 		return
 	}

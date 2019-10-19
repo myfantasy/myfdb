@@ -267,3 +267,41 @@ Json
 	"col_type":"string"
 }
 ```
+
+
+
+
+
+
+### Security
+
+USE Tokens for security  
+Append Headr "Token" with value of your token  
+
+The number of tokens is not limited  
+
+#### Token Add
+
+POST  
+```
+localhost:9170/sec/token_add/
+```
+Json  
+```
+{
+"token":"abc"
+}
+```
+
+#### Token Remove
+
+POST  
+```
+localhost:9170/sec/token_remove/
+```
+Json  
+```
+{
+"token":"abc"
+}
+```
