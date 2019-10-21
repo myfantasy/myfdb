@@ -1,0 +1,18 @@
+[Unit]
+Description=myfdb
+
+[Service]
+Type=simple
+User=myfdb
+EnvironmentFile=/etc/myfdb.d/myfdb.cfg
+ExecStart=/opt/myfdb/bin/app
+ExecReload=/bin/kill -HUP $MAINPID
+KillMode=mixed
+KillSignal=SIGINT
+TimeoutSec=0
+Restart=on-failure
+RestartSec=15
+
+[Install]
+WantedBy=multi-user.target
+
