@@ -76,7 +76,7 @@ func (db *DB) GetItemFromTableIntFromJSON(d []byte) (data []byte, parErr error, 
 		ro := make(map[string]interface{})
 		itms, parErr, intErr := tbl.GetAll(tblP.Limit, tblP.IncludeDeleted)
 
-		ro["items"] = itms
+		ro["itms"] = itms
 		if parErr != nil {
 			ro["params_err"] = parErr
 		}
@@ -197,7 +197,7 @@ func (db *DB) GetItemFromTableStringFromJSON(d []byte) (data []byte, parErr erro
 		ro := make(map[string]interface{})
 		itms, parErr, intErr := tbl.GetAll(tblP.Limit, tblP.IncludeDeleted)
 
-		ro["items"] = itms
+		ro["itms"] = itms
 		if parErr != nil {
 			ro["params_err"] = parErr
 		}
