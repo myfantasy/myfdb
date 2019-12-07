@@ -21,12 +21,14 @@ type TableMapInt struct {
 	storageName string
 
 	TableStruct TableStructData
+
+	ItmStruct *ItemStruct
 }
 
 // TableStructData - struct table
 type TableStructData struct {
-	NamesIndexInt    map[string]string
-	NamesIndexString map[string]string
+	NamesIndexInt    map[string]string `json:"name_of_int_indexes,omitempty"`
+	NamesIndexString map[string]string `json:"name_of_string_indexes,omitempty"`
 }
 
 // GetType type name return
@@ -270,72 +272,88 @@ func (tmi *TableMapInt) Set(itm ItemInt) (itmOut ItemInt, isNew bool, isRvEqual 
 
 	tmi.Data[itm.Key] = itm
 
-	//IntIndex
-	{
-		var okOO bool
-		var okON bool
-		var okLO bool
-		var okLN bool
+	if len(tmi.TableStruct.NamesIndexInt) > 0 || len(tmi.TableStruct.NamesIndexString) > 0 {
 
-		var vOO int64
-		var vON int64
-		var vLO []int64
-		var vLN []int64
-
-		for k := range tmi.TableStruct.NamesIndexInt {
-			if okOld {
-				vOO, okOO = itmOld.FieldsInt[k]
-				vLO, okLO = itmOld.FieldsIntA[k]
-			}
-			vON, okON = itm.FieldsInt[k]
-			vLN, okLN = itm.FieldsIntA[k]
-
-			if okOO || okLO || okON || okLN {
-				if okOO {
-					vLO = append(vLO, vOO)
-				}
-
-				if okON {
-					vLN = append(vLN, vON)
-				}
-
-				tmi.IntIndexes[k].Set(itm.Key, vLN, vLO)
+		iis, _, err := ItemIntMake(itm.Data, tmi.ItmStruct)
+		if err != nil {
+			return itmOut, isNew, isRvEqual, err
+		}
+		var iisOld ItemIntStruct
+		if okOld {
+			iisOld, _, err = ItemIntMake(itmOld.Data, tmi.ItmStruct)
+			if err != nil {
+				return itmOut, isNew, isRvEqual, err
 			}
 		}
-	}
 
-	//StringIndex
-	{
-		var okOO bool
-		var okON bool
-		var okLO bool
-		var okLN bool
+		//IntIndex
+		{
+			var okOO bool
+			var okON bool
+			var okLO bool
+			var okLN bool
 
-		var vOO string
-		var vON string
-		var vLO []string
-		var vLN []string
+			var vOO int64
+			var vON int64
+			var vLO []int64
+			var vLN []int64
 
-		for k := range tmi.TableStruct.NamesIndexString {
-			if okOld {
-				vOO, okOO = itmOld.FieldsString[k]
-				vLO, okLO = itmOld.FieldsStringA[k]
-			}
-			vON, okON = itm.FieldsString[k]
-			vLN, okLN = itm.FieldsStringA[k]
-
-			if okOO || okLO || okON || okLN {
-				if okOO {
-					vLO = append(vLO, vOO)
+			for k := range tmi.TableStruct.NamesIndexInt {
+				if okOld {
+					vOO, okOO = iisOld.FieldsInt[k]
+					vLO, okLO = iisOld.FieldsIntA[k]
 				}
+				vON, okON = iis.FieldsInt[k]
+				vLN, okLN = iis.FieldsIntA[k]
 
-				if okON {
-					vLN = append(vLN, vON)
+				if okOO || okLO || okON || okLN {
+					if okOO {
+						vLO = append(vLO, vOO)
+					}
+
+					if okON {
+						vLN = append(vLN, vON)
+					}
+
+					tmi.IntIndexes[k].Set(itm.Key, vLN, vLO)
 				}
-
-				tmi.StringIndexes[k].Set(itm.Key, vLN, vLO)
 			}
 		}
+
+		//StringIndex
+		{
+			var okOO bool
+			var okON bool
+			var okLO bool
+			var okLN bool
+
+			var vOO string
+			var vON string
+			var vLO []string
+			var vLN []string
+
+			for k := range tmi.TableStruct.NamesIndexString {
+				if okOld {
+					vOO, okOO = iisOld.FieldsString[k]
+					vLO, okLO = iisOld.FieldsStringA[k]
+				}
+				vON, okON = iis.FieldsString[k]
+				vLN, okLN = iis.FieldsStringA[k]
+
+				if okOO || okLO || okON || okLN {
+					if okOO {
+						vLO = append(vLO, vOO)
+					}
+
+					if okON {
+						vLN = append(vLN, vON)
+					}
+
+					tmi.StringIndexes[k].Set(itm.Key, vLN, vLO)
+				}
+			}
+		}
+
 	}
 
 	tmi.needSave = true

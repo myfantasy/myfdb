@@ -10,13 +10,15 @@ import (
 
 // DB - database struct
 type DB struct {
-	IntTable    map[string]*TableInt
-	StringTable map[string]*TableString
-	BaseStorage string
+	IntTable    map[string]*TableInt    `json:"int_tables"`
+	StringTable map[string]*TableString `json:"string_tables"`
+	BaseStorage string                  `json:"base_storage"`
 
-	DefaultFlushTimeout time.Duration
+	NameInCluster string `json:"cluster_name"`
 
-	MasterTokens []string
+	DefaultFlushTimeout time.Duration `json:"default_flush_timeout"`
+
+	MasterTokens []string `json:"master_tokens"`
 	tokenOk      map[string]bool
 
 	eo ErrorsOut
