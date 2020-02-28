@@ -12,6 +12,7 @@
 *.out
 
 bin/app
+bin/app_tst
 
 /data/*
 /db/*
