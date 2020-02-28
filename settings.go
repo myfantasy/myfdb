@@ -5,6 +5,7 @@ import (
 	"time"
 
 	env "github.com/kelseyhightower/envconfig"
+	log "github.com/sirupsen/logrus"
 )
 
 var (
@@ -16,6 +17,8 @@ type envConfig struct {
 	DBFlushTimeout time.Duration `default:"1s"`
 
 	Port int `default:"9170"`
+
+	LogLevel log.Level `envconfig:"LOG_LEVEL" default:"info"`
 }
 
 func initConf() {
@@ -23,5 +26,7 @@ func initConf() {
 		env.Usage("", &config)
 		os.Exit(1)
 	}
+
+	log.SetLevel(config.LogLevel)
 
 }
