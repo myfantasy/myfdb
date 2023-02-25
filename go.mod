@@ -8,5 +8,5 @@ require (
 	github.com/myfantasy/mdp v0.0.15
 	github.com/sirupsen/logrus v1.4.2
 	github.com/valyala/fasthttp v1.9.0
-	golang.org/x/sys v0.0.0-20191018095205-727590c5006e // indirect
+	golang.org/x/sys v0.1.0 // indirect
 )
